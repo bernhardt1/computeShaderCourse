@@ -1,0 +1,75 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel SolidRed
+#pragma kernel SolidYellow
+#pragma kernel SplitScreen
+#pragma kernel Circle
+#pragma kernel BlueSquare
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+int texResolution;
+
+[numthreads(8,8,1)]
+void SolidRed (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    Result[id.xy] = float4(1, 0, 1, 1);
+}
+
+[numthreads(8,8,1)]
+void SolidYellow (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    Result[id.xy] = float4(1, 1, 0, 1);
+}
+
+[numthreads(8,8,1)]
+void SplitScreen (uint3 id : SV_DispatchThreadID)
+{
+    bool halfwayX = id.x > (texResolution / 2);
+    bool halfwayY = id.y > (texResolution / 2);
+
+    Result[id.xy] = float4(halfwayX ? 1 : 0, halfwayY ? 1 : 0, 0, 1);
+
+}
+
+float inCircle (float2 pt, float radius)
+{
+    return length(pt) < radius ? 1.0 : 0.0;
+}
+
+[numthreads(8,8,1)]
+void Circle (uint3 id : SV_DispatchThreadID)
+{
+    // (h, k) represent the center of the circle
+    //  (x – h)2+ (y – k)2 = r2
+
+    int halfRes = texResolution / 2;
+
+    float res = inCircle((float2)((int2)id.xy - halfRes), halfRes / 2);
+
+    Result[id.xy] = float4(res, res, 0, 1);
+}
+
+float inSquare(float2 pt, float halfLength)
+{
+    bool xIn = pt.x < halfLength;
+    bool yIn = pt.y < halfLength;
+
+    if (xIn && yIn) return 1.0;
+    return 0.0;
+}
+
+[numthreads(8,8,1)]
+void BlueSquare (uint3 id : SV_DispatchThreadID)
+{
+    int halfRes = texResolution / 2;
+
+    float res = inSquare((float2)((int2)id.xy - halfRes), halfRes / 2);
+
+    Result[id.xy] = float4(0, 0, res, 1);
+
+}
