@@ -68,8 +68,12 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         center.y /= aspectRatio;
     }
 
-    float3 color = onLine(uv.y, center.y, 0.002, 0.001) * axisColor.rgb;//xAxis
+    float3 color = onLine(uv.y, center.y, 0.002, 0.001) * axisColor.rgb; //xAxis
     //TO DO: Add code here
+    color += onLine(uv.x, center.x, 0.002, 0.001) * axisColor.rgb; //yAxis
+    color += circle(uv, center, 0.15, 0.002, 0.001);
+    color += circle(uv, center, 0.3, 0.002, 0.001);
+    color += circle(uv, center, 0.45, 0.002, 0.001);
 
     float alpha = saturate(color.r + color.g + color.b);
     float3 finalColor = lerp(source[id.xy].rgb, color, alpha);

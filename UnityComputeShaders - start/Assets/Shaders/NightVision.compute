@@ -25,7 +25,11 @@ float inCircle( float2 pt, float2 center, float radius, float edgeWidth ){
 [numthreads(8, 8, 1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
-    float3 finalColor = source[id.xy].rgb;
+    uint2 index = (uint2(id.x, id.y) / 3) * 3;
+
+    float3 srcColor = source[index].rgb;
+    float3 finalColor = srcColor;
+
            
     output[id.xy] = float4(finalColor, 1);
 }

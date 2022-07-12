@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class ParticleFun : MonoBehaviour
 {
+    public bool isTouchControls = false;
 
     private Vector2 cursorPos;
 
@@ -34,6 +35,8 @@ public class ParticleFun : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+
+
         Init();
     }
 
@@ -44,7 +47,23 @@ public class ParticleFun : MonoBehaviour
 
         for (int i = 0; i < particleCount; i++)
         {
-            //TO DO: Initialize particle
+            Vector3 v = new Vector3();
+            v.x = Random.value * 2 - 1.0f;
+            v.y = Random.value * 2 - 1.0f;
+            v.z = Random.value * 2 - 1.0f;
+
+            v.Normalize();
+            v *= Random.value * 0.5f;
+
+            particleArray[i].position.x = v.x;
+            particleArray[i].position.y = v.y;
+            particleArray[i].position.z = v.z + 3;
+
+            particleArray[i].velocity.x = 0;
+            particleArray[i].velocity.y = 0;
+            particleArray[i].velocity.z = 0;
+
+            particleArray[i].life = Random.value * 5.0f + 1.0f;
         }
 
         // create compute buffer
@@ -85,8 +104,11 @@ public class ParticleFun : MonoBehaviour
         float[] mousePosition2D = { cursorPos.x, cursorPos.y };
 
         // Send datas to the compute shader
-        shader.SetFloat("deltaTime", Time.deltaTime);
+        shader.SetFloat("deltaTime",  Time.deltaTime);
+        // Debug.Log(" Time.deltaTime: " +  Time.deltaTime);
         shader.SetFloats("mousePosition", mousePosition2D);
+        Debug.Log("mousePosition2D[0]: " + mousePosition2D[0]);
+        Debug.Log("mousePosition2D[1]: " + mousePosition2D[1]);
 
         // Update the Particles
         shader.Dispatch(kernelID, groupSizeX, 1, 1);
@@ -94,20 +116,46 @@ public class ParticleFun : MonoBehaviour
 
     void OnGUI()
     {
-        Vector3 p = new Vector3();
-        Camera c = Camera.main;
-        Event e = Event.current;
-        Vector2 mousePos = new Vector2();
+        if (isTouchControls)
+        {
+            if (Input.touchCount > 0)
+            {
+                // get the touch that is moving. default to first touch
+                Touch touch = Input.GetTouch(0);
 
-        // Get the mouse position from Event.
-        // Note that the y position from Event is inverted.
-        mousePos.x = e.mousePosition.x;
-        mousePos.y = c.pixelHeight - e.mousePosition.y;
+                if (touch.phase == TouchPhase.Moved)
+                {
+                    Vector3 p = new Vector3();
+                    Camera c = Camera.main;
+                    Vector2 touchPos = new Vector2();
 
-        p = c.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, c.nearClipPlane + 14));// z = 3.
+                    touchPos.x = touch.position.x;
+                    touchPos.y = touch.position.y;
 
-        cursorPos.x = p.x;
-        cursorPos.y = p.y;
+                    p = c.ScreenToWorldPoint(new Vector3(touchPos.x, touchPos.y, c.nearClipPlane + 14));// z = 3.
+
+                    cursorPos.x = p.x;
+                    cursorPos.y = p.y;
+                }
+            }
+        }
+        else
+        {
+            Vector3 p = new Vector3();
+            Camera c = Camera.main;
+            Event e = Event.current;
+            Vector2 mousePos = new Vector2();
+
+            // Get the mouse position from Event.
+            // Note that the y position from Event is inverted.
+            mousePos.x = e.mousePosition.x;
+            mousePos.y = c.pixelHeight - e.mousePosition.y;
+
+            p = c.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, c.nearClipPlane + 14));// z = 3.
+
+            cursorPos.x = p.x;
+            cursorPos.y = p.y;
+        }
         
     }
 }

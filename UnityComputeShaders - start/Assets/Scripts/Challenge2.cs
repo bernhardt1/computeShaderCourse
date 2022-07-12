@@ -6,6 +6,7 @@ public class Challenge2 : MonoBehaviour
 
     public ComputeShader shader;
     public int texResolution = 1024;
+    public int sides = 6;
 
     Renderer rend;
     RenderTexture outputTexture;
@@ -35,6 +36,8 @@ public class Challenge2 : MonoBehaviour
         shader.SetVector("fillColor", fillColor);
         shader.SetVector("clearColor", clearColor);
 
+        shader.SetInt("sides", sides);
+
         shader.SetInt("texResolution", texResolution);
         shader.SetTexture(kernelHandle, "Result", outputTexture);
        
@@ -48,6 +51,7 @@ public class Challenge2 : MonoBehaviour
     }
 
     void Update(){
+        shader.SetFloat("time", Time.time);
         DispatchShader(texResolution / 8, texResolution / 8);
     }
 }

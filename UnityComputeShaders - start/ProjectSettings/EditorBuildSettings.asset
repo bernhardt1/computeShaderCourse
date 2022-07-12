@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/ParticleFun.unity
+    guid: a3ce22acb29244558a2d2c17062b7b36
   m_configObjects: {}
